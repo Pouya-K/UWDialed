@@ -15,9 +15,15 @@ except ImportError:  # pragma: no cover - fallback if dependency missing during 
     def load_dotenv(*_args, **_kwargs):
         return False
 
-# Load credentials from Project/.env so secrets stay out of source control
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
-load_dotenv(PROJECT_ROOT / ".env")
+# Load credentials from .env file for local development
+# On Railway/production, environment variables are injected directly
+try:
+    PROJECT_ROOT = Path(__file__).resolve().parents[3]
+    load_dotenv(PROJECT_ROOT / ".env")
+except IndexError:
+    # Running in a flattened deployment structure (e.g., Railway)
+    # Environment variables are already set by the platform
+    pass
 
 # Database configuration now pulls username/password from the environment
 DB_CONFIG = {
