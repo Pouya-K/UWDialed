@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -69,7 +69,7 @@ function MapPage() {
   };
 
   // Function to add markers to the map
-  const addMarkers = (map, locations) => {
+  const addMarkers = useCallback((map, locations) => {
     // Clear existing markers first
     clearMarkers();
     
@@ -319,7 +319,7 @@ function MapPage() {
       // Store marker and popup references
       markersRef.current.push({ marker, hoverPopup: hoverPopupEl, clickPopup: clickPopupEl });
     });
-  };
+  }, []);
 
   useEffect(() => {
     mapboxgl.accessToken = MAPBOX_TOKEN;
@@ -361,7 +361,7 @@ function MapPage() {
         mapRef.current.remove();
       }
     };
-  }, []); // Only run once on mount
+  }, [MAPBOX_TOKEN, addMarkers, studySpots, viewState.latitude, viewState.longitude, viewState.zoom]); // Only run once on mount
 
   // Update markers when study spots data changes or when map becomes ready
   useEffect(() => {
@@ -388,7 +388,7 @@ function MapPage() {
         };
       }
     }
-  }, [studySpots]); // Run when studySpots changes
+  }, [studySpots, addMarkers]); // Run when studySpots changes
 
   return (
     <div style={{ 
